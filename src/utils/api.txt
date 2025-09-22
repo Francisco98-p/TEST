@@ -1,0 +1,34 @@
+import axios from 'axios';
+
+const POKEAPI_BASE = 'https://pokeapi.co/api/v2';
+
+export const api = axios.create({
+  baseURL: POKEAPI_BASE,
+  timeout: 10000,
+});
+
+export const fetchPokemonList = async (offset: number = 0, limit: number = 20, signal?: AbortSignal): Promise<PokemonListResponse> => {
+  const response = await api.get(`/pokemon?offset=${offset}&limit=${limit}`, { signal });
+  return response.data;
+};
+
+export const fetchPokemonDetail = async (id: string, signal?: AbortSignal): Promise<Pokemon> => {
+  const response = await api.get(`/pokemon/${id}`, { signal });
+  return response.data;
+};
+
+export const fetchPokemonTypes = async (signal?: AbortSignal): Promise<{ results: { name: string; url: string }[] }> => {
+  const response = await api.get('/type', { signal });
+  return response.data;
+};
+
+export const searchPokemon = async (query: string, signal?: AbortSignal): Promise<Pokemon | null> => {
+  if (!query.trim()) return null;
+  
+  try {
+    const response = await api.get(`/pokemon/${query.toLowerCase()}`, { signal });
+    return response.data;
+  } catch (error) {
+    return null;
+  }
+};

@@ -1,0 +1,39 @@
+import { useState, useEffect } from 'react';
+
+export function useFavorites() {
+  const [favorites, setFavorites] = useState<number[]>([]);
+
+  useEffect(() => {
+    const stored = localStorage.getItem('pokemon-favorites');
+    if (stored) {
+      try {
+        setFavorites(JSON.parse(stored));
+      } catch (error) {
+        console.error('Error loading favorites from localStorage:', error);
+      }
+    }
+  }, []);
+
+  const toggleFavorite = (id: number) => {
+    setFavorites(prev => {
+      const newFavorites = prev.includes(id)
+        ? prev.filter(favId => favId !== id)
+        : [...prev, id];
+      
+      try {
+        localStorage.setItem('pokemon-favorites', JSON.stringify(newFavorites));
+      } catch (error) {
+        console.error('Error saving favorites to localStorage:', error);
+      }
+      return newFavorites;
+    });
+  };
+
+  const isFavorite = (id: number) => favorites.includes(id);
+
+  return {
+    favorites,
+    toggleFavorite,
+    isFavorite,
+  };
+}
